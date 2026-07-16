@@ -1,0 +1,14 @@
+# Archivos temporales de Code::Blocks
+obj/
+bin/
+
+# Layout del IDE
+*.layout
+*.depend
+
+# Copias de proyectos
+*Viejo.cbp
+
+# Archivos temporales
+*.o
+*.exe

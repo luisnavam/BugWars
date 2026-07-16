@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="BugWars" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/BugWars" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/BugWars" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-std=c++17" />
+			<Add directory="include" />
+			<Add directory="C:/SFML-3.0.0/include" />
+		</Compiler>
+		<Linker>
+			<Add library="C:/SFML-3.0.0/lib/libsfml-graphics.a" />
+			<Add library="C:/SFML-3.0.0/lib/libsfml-window.a" />
+			<Add library="C:/SFML-3.0.0/lib/libsfml-system.a" />
+			<Add directory="C:/SFML-3.0.0/lib" />
+		</Linker>
+		<Unit filename="include/controlador/JuegoControlador.h" />
+		<Unit filename="include/modelo/BugBasico.h" />
+		<Unit filename="include/modelo/CargaCodigo.h" />
+		<Unit filename="include/modelo/Direccion.h" />
+		<Unit filename="include/modelo/Enemigo.h" />
+		<Unit filename="include/modelo/EstadoCarga.h" />
+		<Unit filename="include/modelo/Explosion.h" />
+		<Unit filename="include/modelo/IdJugador.h" />
+		<Unit filename="include/modelo/Jugador.h" />
+		<Unit filename="include/modelo/Partida.h" />
+		<Unit filename="include/modelo/Posicion.h" />
+		<Unit filename="include/modelo/SistemaCargas.h" />
+		<Unit filename="include/modelo/Tablero.h" />
+		<Unit filename="include/modelo/TipoCelda.h" />
+		<Unit filename="include/vista/JuegoVista.h" />
+		<Unit filename="src/Main.cpp" />
+		<Unit filename="src/controlador/JuegoControlador.cpp" />
+		<Unit filename="src/modelo/BugBasico.cpp" />
+		<Unit filename="src/modelo/CargaCodigo.cpp" />
+		<Unit filename="src/modelo/Enemigo.cpp" />
+		<Unit filename="src/modelo/Explosion.cpp" />
+		<Unit filename="src/modelo/Jugador.cpp" />
+		<Unit filename="src/modelo/Partida.cpp" />
+		<Unit filename="src/modelo/SistemaCargas.cpp" />
+		<Unit filename="src/modelo/Tablero.cpp" />
+		<Unit filename="src/vista/JuegoVista.cpp" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
