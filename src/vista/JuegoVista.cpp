@@ -1,7 +1,9 @@
 #include "vista/JuegoVista.h"
 
+#include "modelo/BugResistente.h"
 #include "modelo/CargaCodigo.h"
 #include "modelo/Enemigo.h"
+#include "modelo/EstadoPartida.h"
 #include "modelo/Explosion.h"
 #include "modelo/Jugador.h"
 #include "modelo/Partida.h"
@@ -39,17 +41,20 @@ void JuegoVista::renderizar(const Partida& partida)
 
     dibujarTablero(partida);
 
-    for (const CargaCodigo& carga : partida.obtenerCargas())
+    for (const CargaCodigo& carga :
+         partida.obtenerCargas())
     {
         dibujarCarga(carga);
     }
 
-    for (const Explosion& explosion : partida.obtenerExplosiones())
+    for (const Explosion& explosion :
+         partida.obtenerExplosiones())
     {
         dibujarExplosion(explosion);
     }
 
-    for (const auto& enemigo : partida.obtenerEnemigos())
+    for (const auto& enemigo :
+         partida.obtenerEnemigos())
     {
         if (enemigo->estaActivo())
         {
@@ -75,21 +80,35 @@ void JuegoVista::renderizar(const Partida& partida)
 
     dibujarHUD(partida);
 
+    if (partida.obtenerEstado() !=
+        EstadoPartida::Jugando)
+    {
+        dibujarPantallaFinal(partida);
+    }
+
     ventana.display();
 }
 
-void JuegoVista::dibujarTablero(const Partida& partida)
+void JuegoVista::dibujarTablero(
+    const Partida& partida
+)
 {
-    const Tablero& tablero = partida.obtenerTablero();
+    const Tablero& tablero =
+        partida.obtenerTablero();
 
-    for (int fila = 0; fila < Tablero::FILAS; ++fila)
+    for (int fila = 0;
+         fila < Tablero::FILAS;
+         ++fila)
     {
         for (int columna = 0;
              columna < Tablero::COLUMNAS;
              ++columna)
         {
             const TipoCelda tipo =
-                tablero.obtenerCelda(fila, columna);
+                tablero.obtenerCelda(
+                    fila,
+                    columna
+                );
 
             sf::RectangleShape celda({
                 TAMANO_CELDA - 1.0f,
@@ -192,7 +211,9 @@ void JuegoVista::dibujarJugador(
     const sf::Color& color
 )
 {
-    sf::CircleShape figura(TAMANO_CELDA * 0.30f);
+    sf::CircleShape figura(
+        TAMANO_CELDA * 0.30f
+    );
 
     figura.setFillColor(color);
     figura.setOutlineThickness(2.0f);
@@ -277,8 +298,12 @@ void JuegoVista::dibujarExplosion(
             TAMANO_CELDA - 6.0f
         });
 
-        figura.setFillColor(colorExplosion);
+        figura.setFillColor(
+            colorExplosion
+        );
+
         figura.setOutlineThickness(2.0f);
+
         figura.setOutlineColor(
             sf::Color(255, 230, 90)
         );
@@ -299,22 +324,62 @@ void JuegoVista::dibujarEnemigo(
     const Enemigo& enemigo
 )
 {
+    const BugResistente* bugResistente =
+        dynamic_cast<const BugResistente*>(
+            &enemigo
+        );
+
+    float proporcion = 0.55f;
+
+    sf::Color colorCuerpo(
+        145,
+        65,
+        180
+    );
+
+    sf::Color colorBorde(
+        50,
+        20,
+        65
+    );
+
+    if (bugResistente != nullptr)
+    {
+        proporcion = 0.68f;
+
+        if (bugResistente->estaDanado())
+        {
+            colorCuerpo =
+                sf::Color(230, 125, 40);
+
+            colorBorde =
+                sf::Color(110, 50, 15);
+        }
+        else
+        {
+            colorCuerpo =
+                sf::Color(175, 45, 55);
+
+            colorBorde =
+                sf::Color(80, 15, 20);
+        }
+    }
+
     sf::RectangleShape cuerpo({
-        TAMANO_CELDA * 0.55f,
-        TAMANO_CELDA * 0.55f
+        TAMANO_CELDA * proporcion,
+        TAMANO_CELDA * proporcion
     });
 
-    cuerpo.setFillColor(
-        sf::Color(145, 65, 180)
-    );
-
+    cuerpo.setFillColor(colorCuerpo);
     cuerpo.setOutlineThickness(3.0f);
-    cuerpo.setOutlineColor(
-        sf::Color(50, 20, 65)
-    );
+    cuerpo.setOutlineColor(colorBorde);
+
+    const float tamanoCuerpo =
+        TAMANO_CELDA * proporcion;
 
     const float desplazamiento =
-        TAMANO_CELDA * 0.225f;
+        (TAMANO_CELDA - tamanoCuerpo) /
+        2.0f;
 
     cuerpo.setPosition({
         enemigo.obtenerColumna() *
@@ -326,34 +391,45 @@ void JuegoVista::dibujarEnemigo(
 
     ventana.draw(cuerpo);
 
+    const float posicionBaseX =
+        enemigo.obtenerColumna() *
+        TAMANO_CELDA;
+
+    const float posicionBaseY =
+        enemigo.obtenerFila() *
+        TAMANO_CELDA;
+
     for (int ojo = 0; ojo < 2; ++ojo)
     {
-        sf::CircleShape figuraOjo(4.0f);
+        sf::CircleShape figuraOjo(
+            bugResistente != nullptr
+                ? 5.0f
+                : 4.0f
+        );
 
         figuraOjo.setFillColor(
             sf::Color(245, 245, 245)
         );
 
         figuraOjo.setPosition({
-            enemigo.obtenerColumna() *
-                TAMANO_CELDA +
-                15.0f +
-                ojo * 13.0f,
+            posicionBaseX +
+                14.0f +
+                ojo * 14.0f,
 
-            enemigo.obtenerFila() *
-                TAMANO_CELDA +
-                17.0f
+            posicionBaseY + 16.0f
         });
 
         ventana.draw(figuraOjo);
     }
 }
 
-void JuegoVista::dibujarHUD(const Partida& partida)
+void JuegoVista::dibujarHUD(
+    const Partida& partida
+)
 {
     sf::RectangleShape panel({
         ANCHO_PANEL,
-        624.0f
+        ALTO_VENTANA
     });
 
     panel.setPosition({
@@ -366,6 +442,7 @@ void JuegoVista::dibujarHUD(const Partida& partida)
     );
 
     panel.setOutlineThickness(-3.0f);
+
     panel.setOutlineColor(
         sf::Color(70, 76, 88)
     );
@@ -403,6 +480,7 @@ void JuegoVista::dibujarVidas(
 
     identificador.setFillColor(color);
     identificador.setOutlineThickness(2.0f);
+
     identificador.setOutlineColor(
         sf::Color(235, 235, 235)
     );
@@ -411,10 +489,13 @@ void JuegoVista::dibujarVidas(
 
     for (int vida = 0; vida < 3; ++vida)
     {
-        sf::CircleShape indicadorVida(14.0f);
+        sf::CircleShape indicadorVida(
+            14.0f
+        );
 
         indicadorVida.setPosition({
-            ANCHO_TABLERO + 38.0f +
+            ANCHO_TABLERO +
+                38.0f +
                 vida * 48.0f,
 
             posicionY + 70.0f
@@ -433,11 +514,308 @@ void JuegoVista::dibujarVidas(
             );
         }
 
-        indicadorVida.setOutlineThickness(2.0f);
+        indicadorVida.setOutlineThickness(
+            2.0f
+        );
+
         indicadorVida.setOutlineColor(
             sf::Color(235, 235, 235)
         );
 
         ventana.draw(indicadorVida);
     }
+}
+
+void JuegoVista::dibujarPantallaFinal(
+    const Partida& partida
+)
+{
+    sf::RectangleShape fondoOscuro({
+        920.0f,
+        ALTO_VENTANA
+    });
+
+    fondoOscuro.setFillColor(
+        sf::Color(10, 12, 16, 185)
+    );
+
+    ventana.draw(fondoOscuro);
+
+    const bool esVictoria =
+        partida.obtenerEstado() ==
+        EstadoPartida::Victoria;
+
+    const sf::Color colorPrincipal =
+        esVictoria
+        ? sf::Color(55, 180, 105)
+        : sf::Color(205, 65, 75);
+
+    sf::RectangleShape cartel({
+        420.0f,
+        310.0f
+    });
+
+    cartel.setPosition({
+        250.0f,
+        155.0f
+    });
+
+    cartel.setFillColor(
+        sf::Color(32, 36, 43)
+    );
+
+    cartel.setOutlineThickness(6.0f);
+    cartel.setOutlineColor(
+        colorPrincipal
+    );
+
+    ventana.draw(cartel);
+
+    sf::RectangleShape franjaSuperior({
+        420.0f,
+        62.0f
+    });
+
+    franjaSuperior.setPosition({
+        250.0f,
+        155.0f
+    });
+
+    franjaSuperior.setFillColor(
+        colorPrincipal
+    );
+
+    ventana.draw(franjaSuperior);
+
+    if (esVictoria)
+    {
+        dibujarSimboloVictoria();
+    }
+    else
+    {
+        dibujarSimboloDerrota();
+    }
+
+    dibujarIndicadorReinicio();
+}
+
+void JuegoVista::dibujarSimboloVictoria()
+{
+    sf::CircleShape circulo(58.0f);
+
+    circulo.setPosition({
+        402.0f,
+        235.0f
+    });
+
+    circulo.setFillColor(
+        sf::Color(40, 125, 75)
+    );
+
+    circulo.setOutlineThickness(5.0f);
+
+    circulo.setOutlineColor(
+        sf::Color(120, 240, 160)
+    );
+
+    ventana.draw(circulo);
+
+    sf::RectangleShape tramoCorto({
+        18.0f,
+        55.0f
+    });
+
+    tramoCorto.setPosition({
+        428.0f,
+        285.0f
+    });
+
+    tramoCorto.setFillColor(
+        sf::Color(245, 245, 245)
+    );
+
+    tramoCorto.setRotation(
+        sf::degrees(-45.0f)
+    );
+
+    ventana.draw(tramoCorto);
+
+    sf::RectangleShape tramoLargo({
+        18.0f,
+        95.0f
+    });
+
+    tramoLargo.setPosition({
+        454.0f,
+        309.0f
+    });
+
+    tramoLargo.setFillColor(
+        sf::Color(245, 245, 245)
+    );
+
+    tramoLargo.setRotation(
+        sf::degrees(-135.0f)
+    );
+
+    ventana.draw(tramoLargo);
+}
+
+void JuegoVista::dibujarSimboloDerrota()
+{
+    sf::CircleShape circulo(58.0f);
+
+    circulo.setPosition({
+        402.0f,
+        235.0f
+    });
+
+    circulo.setFillColor(
+        sf::Color(135, 40, 50)
+    );
+
+    circulo.setOutlineThickness(5.0f);
+
+    circulo.setOutlineColor(
+        sf::Color(245, 120, 130)
+    );
+
+    ventana.draw(circulo);
+
+    sf::RectangleShape diagonalUno({
+        18.0f,
+        95.0f
+    });
+
+    diagonalUno.setPosition({
+        425.0f,
+        263.0f
+    });
+
+    diagonalUno.setFillColor(
+        sf::Color(245, 245, 245)
+    );
+
+    diagonalUno.setRotation(
+        sf::degrees(-45.0f)
+    );
+
+    ventana.draw(diagonalUno);
+
+    sf::RectangleShape diagonalDos({
+        18.0f,
+        95.0f
+    });
+
+    diagonalDos.setPosition({
+        492.0f,
+        250.0f
+    });
+
+    diagonalDos.setFillColor(
+        sf::Color(245, 245, 245)
+    );
+
+    diagonalDos.setRotation(
+        sf::degrees(45.0f)
+    );
+
+    ventana.draw(diagonalDos);
+}
+
+void JuegoVista::dibujarIndicadorReinicio()
+{
+    sf::RectangleShape teclaEnter({
+        150.0f,
+        48.0f
+    });
+
+    teclaEnter.setPosition({
+        385.0f,
+        390.0f
+    });
+
+    teclaEnter.setFillColor(
+        sf::Color(58, 64, 74)
+    );
+
+    teclaEnter.setOutlineThickness(3.0f);
+
+    teclaEnter.setOutlineColor(
+        sf::Color(210, 215, 225)
+    );
+
+    ventana.draw(teclaEnter);
+
+    sf::RectangleShape lineaHorizontal({
+        65.0f,
+        8.0f
+    });
+
+    lineaHorizontal.setPosition({
+        420.0f,
+        409.0f
+    });
+
+    lineaHorizontal.setFillColor(
+        sf::Color(235, 235, 235)
+    );
+
+    ventana.draw(lineaHorizontal);
+
+    sf::RectangleShape lineaVertical({
+        8.0f,
+        24.0f
+    });
+
+    lineaVertical.setPosition({
+        477.0f,
+        393.0f
+    });
+
+    lineaVertical.setFillColor(
+        sf::Color(235, 235, 235)
+    );
+
+    ventana.draw(lineaVertical);
+
+    sf::RectangleShape puntaSuperior({
+        8.0f,
+        22.0f
+    });
+
+    puntaSuperior.setPosition({
+        414.0f,
+        405.0f
+    });
+
+    puntaSuperior.setFillColor(
+        sf::Color(235, 235, 235)
+    );
+
+    puntaSuperior.setRotation(
+        sf::degrees(45.0f)
+    );
+
+    ventana.draw(puntaSuperior);
+
+    sf::RectangleShape puntaInferior({
+        8.0f,
+        22.0f
+    });
+
+    puntaInferior.setPosition({
+        418.0f,
+        414.0f
+    });
+
+    puntaInferior.setFillColor(
+        sf::Color(235, 235, 235)
+    );
+
+    puntaInferior.setRotation(
+        sf::degrees(135.0f)
+    );
+
+    ventana.draw(puntaInferior);
 }

@@ -42,10 +42,12 @@
 		</Linker>
 		<Unit filename="include/controlador/JuegoControlador.h" />
 		<Unit filename="include/modelo/BugBasico.h" />
+		<Unit filename="include/modelo/BugResistente.h" />
 		<Unit filename="include/modelo/CargaCodigo.h" />
 		<Unit filename="include/modelo/Direccion.h" />
 		<Unit filename="include/modelo/Enemigo.h" />
 		<Unit filename="include/modelo/EstadoCarga.h" />
+		<Unit filename="include/modelo/EstadoPartida.h" />
 		<Unit filename="include/modelo/Explosion.h" />
 		<Unit filename="include/modelo/IdJugador.h" />
 		<Unit filename="include/modelo/Jugador.h" />
@@ -58,6 +60,7 @@
 		<Unit filename="src/Main.cpp" />
 		<Unit filename="src/controlador/JuegoControlador.cpp" />
 		<Unit filename="src/modelo/BugBasico.cpp" />
+		<Unit filename="src/modelo/BugResistente.cpp" />
 		<Unit filename="src/modelo/CargaCodigo.cpp" />
 		<Unit filename="src/modelo/Enemigo.cpp" />
 		<Unit filename="src/modelo/Explosion.cpp" />

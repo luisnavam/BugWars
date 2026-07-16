@@ -6,6 +6,7 @@
 #include "modelo/CargaCodigo.h"
 #include "modelo/Direccion.h"
 #include "modelo/Enemigo.h"
+#include "modelo/EstadoPartida.h"
 #include "modelo/Explosion.h"
 #include "modelo/IdJugador.h"
 #include "modelo/Jugador.h"
@@ -18,6 +19,7 @@ public:
     Partida();
 
     void actualizar(float deltaTiempo);
+    void reiniciar();
 
     bool moverJugador(
         IdJugador idJugador,
@@ -25,6 +27,8 @@ public:
     );
 
     bool colocarCarga(IdJugador idJugador);
+
+    EstadoPartida obtenerEstado() const;
 
     const Tablero& obtenerTablero() const;
     const Jugador& obtenerProfesor() const;
@@ -41,6 +45,7 @@ public:
 
 private:
     float tiempoTranscurrido;
+    EstadoPartida estado;
 
     Tablero tablero;
     Jugador profesor;
@@ -48,6 +53,9 @@ private:
     SistemaCargas sistemaCargas;
 
     std::vector<std::unique_ptr<Enemigo>> enemigos;
+
+    void crearEnemigosIniciales();
+    void comprobarEstadoFinal();
 
     Jugador& obtenerJugador(IdJugador idJugador);
 
@@ -58,7 +66,18 @@ private:
     ) const;
 
     void resolverDanioExplosiones();
-    void aplicarDanioSiCorresponde(Jugador& jugador);
 
-    void actualizarEnemigos(float deltaTiempo);
+    void aplicarDanioSiCorresponde(
+        Jugador& jugador
+    );
+
+    void actualizarEnemigos(
+        float deltaTiempo
+    );
+
+    void resolverDanioPorContacto();
+
+    void aplicarDanioPorContacto(
+        Jugador& jugador
+    );
 };

@@ -26,8 +26,11 @@ private:
     static constexpr float TAMANO_CELDA = 48.0f;
     static constexpr float ANCHO_TABLERO = 720.0f;
     static constexpr float ANCHO_PANEL = 200.0f;
+    static constexpr float ALTO_VENTANA = 624.0f;
 
-    void dibujarTablero(const Partida& partida);
+    void dibujarTablero(
+        const Partida& partida
+    );
 
     void dibujarJugador(
         const Jugador& jugador,
@@ -55,4 +58,12 @@ private:
         float posicionY,
         const sf::Color& color
     );
+
+    void dibujarPantallaFinal(
+        const Partida& partida
+    );
+
+    void dibujarSimboloVictoria();
+    void dibujarSimboloDerrota();
+    void dibujarIndicadorReinicio();
 };

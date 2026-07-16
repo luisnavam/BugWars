@@ -1,6 +1,7 @@
 #include "controlador/JuegoControlador.h"
 
 #include "modelo/Direccion.h"
+#include "modelo/EstadoPartida.h"
 #include "modelo/IdJugador.h"
 
 JuegoControlador::JuegoControlador()
@@ -56,6 +57,18 @@ void JuegoControlador::procesarEventos()
         {
             vista.cerrar();
             return;
+        }
+
+        if (partida.obtenerEstado() !=
+            EstadoPartida::Jugando)
+        {
+            if (codigo ==
+                sf::Keyboard::Scancode::Enter)
+            {
+                partida.reiniciar();
+            }
+
+            continue;
         }
 
         // Profesor: W, A, S, D y Espacio.

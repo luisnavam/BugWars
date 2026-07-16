@@ -1,4 +1,3 @@
-
 #include "modelo/Enemigo.h"
 
 Enemigo::Enemigo(
@@ -9,13 +8,32 @@ Enemigo::Enemigo(
     : fila(filaInicial),
       columna(columnaInicial),
       puntosVida(puntosVidaIniciales),
-      activo(true)
+      activo(true),
+      invulnerabilidadRestante(0.0f)
 {
+}
+
+void Enemigo::actualizarEstado(float deltaTiempo)
+{
+    if (deltaTiempo <= 0.0f)
+    {
+        return;
+    }
+
+    if (invulnerabilidadRestante > 0.0f)
+    {
+        invulnerabilidadRestante -= deltaTiempo;
+
+        if (invulnerabilidadRestante < 0.0f)
+        {
+            invulnerabilidadRestante = 0.0f;
+        }
+    }
 }
 
 void Enemigo::recibirImpacto()
 {
-    if (!activo)
+    if (!activo || esInvulnerable())
     {
         return;
     }
@@ -26,7 +44,11 @@ void Enemigo::recibirImpacto()
     {
         puntosVida = 0;
         activo = false;
+        return;
     }
+
+    invulnerabilidadRestante =
+        DURACION_INVULNERABILIDAD;
 }
 
 int Enemigo::obtenerFila() const
@@ -47,4 +69,23 @@ int Enemigo::obtenerPuntosVida() const
 bool Enemigo::estaActivo() const
 {
     return activo;
+}
+
+bool Enemigo::esInvulnerable() const
+{
+    return invulnerabilidadRestante > 0.0f;
+}
+
+void Enemigo::cambiarPosicion(
+    int nuevaFila,
+    int nuevaColumna
+)
+{
+    if (!activo)
+    {
+        return;
+    }
+
+    fila = nuevaFila;
+    columna = nuevaColumna;
 }

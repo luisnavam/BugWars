@@ -1,9 +1,11 @@
 #include "modelo/Partida.h"
 
 #include "modelo/BugBasico.h"
+#include "modelo/BugResistente.h"
 
 Partida::Partida()
     : tiempoTranscurrido(0.0f),
+      estado(EstadoPartida::Jugando),
       tablero(),
       profesor("Profesor", 1, 1),
       estudiante(
@@ -14,14 +16,13 @@ Partida::Partida()
       sistemaCargas(),
       enemigos()
 {
-    enemigos.push_back(
-        std::make_unique<BugBasico>(6, 7)
-    );
+    crearEnemigosIniciales();
 }
 
 void Partida::actualizar(float deltaTiempo)
 {
-    if (deltaTiempo < 0.0f)
+    if (deltaTiempo <= 0.0f ||
+        estado != EstadoPartida::Jugando)
     {
         return;
     }
@@ -36,8 +37,36 @@ void Partida::actualizar(float deltaTiempo)
         tablero
     );
 
-    actualizarEnemigos(deltaTiempo);
     resolverDanioExplosiones();
+    actualizarEnemigos(deltaTiempo);
+    resolverDanioPorContacto();
+
+    comprobarEstadoFinal();
+}
+
+void Partida::reiniciar()
+{
+    tiempoTranscurrido = 0.0f;
+    estado = EstadoPartida::Jugando;
+
+    tablero = Tablero();
+
+    profesor = Jugador(
+        "Profesor",
+        1,
+        1
+    );
+
+    estudiante = Jugador(
+        "Estudiante",
+        Tablero::FILAS - 2,
+        Tablero::COLUMNAS - 2
+    );
+
+    sistemaCargas = SistemaCargas();
+
+    enemigos.clear();
+    crearEnemigosIniciales();
 }
 
 bool Partida::moverJugador(
@@ -45,6 +74,11 @@ bool Partida::moverJugador(
     Direccion direccion
 )
 {
+    if (estado != EstadoPartida::Jugando)
+    {
+        return false;
+    }
+
     Jugador& jugador = obtenerJugador(idJugador);
 
     if (!jugador.estaActivo())
@@ -104,11 +138,21 @@ bool Partida::moverJugador(
         nuevaColumna
     );
 
+    resolverDanioPorContacto();
+    comprobarEstadoFinal();
+
     return true;
 }
 
-bool Partida::colocarCarga(IdJugador idJugador)
+bool Partida::colocarCarga(
+    IdJugador idJugador
+)
 {
+    if (estado != EstadoPartida::Jugando)
+    {
+        return false;
+    }
+
     const Jugador& jugador =
         idJugador == IdJugador::Profesor
         ? profesor
@@ -124,6 +168,11 @@ bool Partida::colocarCarga(IdJugador idJugador)
         jugador.obtenerColumna(),
         idJugador
     );
+}
+
+EstadoPartida Partida::obtenerEstado() const
+{
+    return estado;
 }
 
 const Tablero& Partida::obtenerTablero() const
@@ -157,6 +206,44 @@ const std::vector<std::unique_ptr<Enemigo>>&
 Partida::obtenerEnemigos() const
 {
     return enemigos;
+}
+
+void Partida::crearEnemigosIniciales()
+{
+    enemigos.push_back(
+        std::make_unique<BugBasico>(6, 7)
+    );
+
+    enemigos.push_back(
+        std::make_unique<BugResistente>(8, 10)
+    );
+}
+
+void Partida::comprobarEstadoFinal()
+{
+    if (!profesor.estaActivo() &&
+        !estudiante.estaActivo())
+    {
+        estado = EstadoPartida::Derrota;
+        return;
+    }
+
+    bool existeEnemigoActivo = false;
+
+    for (const std::unique_ptr<Enemigo>& enemigo :
+         enemigos)
+    {
+        if (enemigo->estaActivo())
+        {
+            existeEnemigoActivo = true;
+            break;
+        }
+    }
+
+    if (!existeEnemigoActivo)
+    {
+        estado = EstadoPartida::Victoria;
+    }
 }
 
 Jugador& Partida::obtenerJugador(
@@ -195,6 +282,28 @@ void Partida::resolverDanioExplosiones()
 {
     aplicarDanioSiCorresponde(profesor);
     aplicarDanioSiCorresponde(estudiante);
+
+    for (const std::unique_ptr<Enemigo>& enemigo :
+         enemigos)
+    {
+        if (!enemigo->estaActivo())
+        {
+            continue;
+        }
+
+        for (const Explosion& explosion :
+             sistemaCargas.obtenerExplosiones())
+        {
+            if (explosion.afecta(
+                    enemigo->obtenerFila(),
+                    enemigo->obtenerColumna()
+                ))
+            {
+                enemigo->recibirImpacto();
+                break;
+            }
+        }
+    }
 }
 
 void Partida::aplicarDanioSiCorresponde(
@@ -221,13 +330,83 @@ void Partida::aplicarDanioSiCorresponde(
     }
 }
 
-void Partida::actualizarEnemigos(float deltaTiempo)
+void Partida::actualizarEnemigos(
+    float deltaTiempo
+)
 {
-    for (const std::unique_ptr<Enemigo>& enemigo : enemigos)
+    for (const std::unique_ptr<Enemigo>& enemigo :
+         enemigos)
     {
-        if (enemigo->estaActivo())
+        if (!enemigo->estaActivo())
         {
-            enemigo->actualizar(deltaTiempo);
+            continue;
+        }
+
+        enemigo->actualizarEstado(deltaTiempo);
+
+        BugBasico* bugBasico =
+            dynamic_cast<BugBasico*>(
+                enemigo.get()
+            );
+
+        if (bugBasico != nullptr)
+        {
+            bugBasico->actualizarConCargas(
+                deltaTiempo,
+                tablero,
+                sistemaCargas,
+                profesor,
+                estudiante
+            );
+        }
+        else
+        {
+            enemigo->actualizar(
+                deltaTiempo,
+                tablero,
+                profesor,
+                estudiante
+            );
+        }
+    }
+}
+
+void Partida::resolverDanioPorContacto()
+{
+    aplicarDanioPorContacto(profesor);
+    aplicarDanioPorContacto(estudiante);
+}
+
+void Partida::aplicarDanioPorContacto(
+    Jugador& jugador
+)
+{
+    if (!jugador.estaActivo() ||
+        jugador.esInvulnerable())
+    {
+        return;
+    }
+
+    for (const std::unique_ptr<Enemigo>& enemigo :
+         enemigos)
+    {
+        if (!enemigo->estaActivo())
+        {
+            continue;
+        }
+
+        const bool mismaFila =
+            enemigo->obtenerFila() ==
+            jugador.obtenerFila();
+
+        const bool mismaColumna =
+            enemigo->obtenerColumna() ==
+            jugador.obtenerColumna();
+
+        if (mismaFila && mismaColumna)
+        {
+            jugador.recibirDanio();
+            return;
         }
     }
 }
