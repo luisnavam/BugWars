@@ -3,10 +3,12 @@
 #include "modelo/Direccion.h"
 #include "modelo/EstadoPartida.h"
 #include "modelo/IdJugador.h"
+#include "modelo/ModoJuego.h"
 
 JuegoControlador::JuegoControlador()
     : partida(),
-      vista()
+      vista(),
+      estadoAplicacion(EstadoAplicacion::Menu)
 {
 }
 
@@ -26,9 +28,30 @@ void JuegoControlador::ejecutar()
         const float deltaTiempo =
             reloj.restart().asSeconds();
 
-        partida.actualizar(deltaTiempo);
-        vista.renderizar(partida);
+        if (estadoAplicacion ==
+            EstadoAplicacion::Jugando)
+        {
+            partida.actualizar(deltaTiempo);
+            vista.renderizar(partida);
+        }
+        else if (estadoAplicacion ==
+                 EstadoAplicacion::Pausado)
+        {
+            vista.renderizarPausa(partida);
+        }
+        else
+        {
+            vista.renderizarMenu();
+        }
     }
+}
+
+void JuegoControlador::iniciarPartida(
+    ModoJuego modo
+)
+{
+    partida.iniciar(modo);
+    estadoAplicacion = EstadoAplicacion::Jugando;
 }
 
 void JuegoControlador::procesarEventos()
@@ -53,10 +76,51 @@ void JuegoControlador::procesarEventos()
         const sf::Keyboard::Scancode codigo =
             tecla->scancode;
 
-        if (codigo == sf::Keyboard::Scancode::Escape)
+        if (estadoAplicacion ==
+            EstadoAplicacion::Menu)
         {
-            vista.cerrar();
-            return;
+            if (codigo ==
+                    sf::Keyboard::Scancode::Num1 ||
+                codigo ==
+                    sf::Keyboard::Scancode::Numpad1)
+            {
+                iniciarPartida(ModoJuego::Solo);
+            }
+            else if (codigo ==
+                         sf::Keyboard::Scancode::Num2 ||
+                     codigo ==
+                         sf::Keyboard::Scancode::Numpad2)
+            {
+                iniciarPartida(ModoJuego::Duo);
+            }
+            else if (codigo ==
+                     sf::Keyboard::Scancode::Escape)
+            {
+                vista.cerrar();
+            }
+
+            continue;
+        }
+
+        if (estadoAplicacion ==
+            EstadoAplicacion::Pausado)
+        {
+            if (codigo ==
+                    sf::Keyboard::Scancode::P ||
+                codigo ==
+                    sf::Keyboard::Scancode::Escape)
+            {
+                estadoAplicacion =
+                    EstadoAplicacion::Jugando;
+            }
+            else if (codigo ==
+                     sf::Keyboard::Scancode::M)
+            {
+                estadoAplicacion =
+                    EstadoAplicacion::Menu;
+            }
+
+            continue;
         }
 
         if (partida.obtenerEstado() !=
@@ -67,7 +131,25 @@ void JuegoControlador::procesarEventos()
             {
                 partida.reiniciar();
             }
+            else if (codigo ==
+                         sf::Keyboard::Scancode::M ||
+                     codigo ==
+                         sf::Keyboard::Scancode::Escape)
+            {
+                estadoAplicacion =
+                    EstadoAplicacion::Menu;
+            }
 
+            continue;
+        }
+
+        if (codigo ==
+                sf::Keyboard::Scancode::P ||
+            codigo ==
+                sf::Keyboard::Scancode::Escape)
+        {
+            estadoAplicacion =
+                EstadoAplicacion::Pausado;
             continue;
         }
 

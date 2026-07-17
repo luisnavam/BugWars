@@ -6,6 +6,10 @@
 Partida::Partida()
     : tiempoTranscurrido(0.0f),
       estado(EstadoPartida::Jugando),
+      modo(ModoJuego::Duo),
+      oleadaActual(1),
+      enTransicionOleada(false),
+      tiempoTransicionOleada(0.0f),
       tablero(),
       profesor("Profesor", 1, 1),
       estudiante(
@@ -16,7 +20,15 @@ Partida::Partida()
       sistemaCargas(),
       enemigos()
 {
-    crearEnemigosIniciales();
+    crearOleadaActual();
+}
+
+void Partida::iniciar(
+    ModoJuego nuevoModo
+)
+{
+    modo = nuevoModo;
+    reiniciar();
 }
 
 void Partida::actualizar(float deltaTiempo)
@@ -27,10 +39,28 @@ void Partida::actualizar(float deltaTiempo)
         return;
     }
 
+    if (enTransicionOleada)
+    {
+        tiempoTransicionOleada -= deltaTiempo;
+
+        if (tiempoTransicionOleada <= 0.0f)
+        {
+            tiempoTransicionOleada = 0.0f;
+            enTransicionOleada = false;
+            crearOleadaActual();
+        }
+
+        return;
+    }
+
     tiempoTranscurrido += deltaTiempo;
 
     profesor.actualizar(deltaTiempo);
-    estudiante.actualizar(deltaTiempo);
+
+    if (esModoDuo())
+    {
+        estudiante.actualizar(deltaTiempo);
+    }
 
     sistemaCargas.actualizar(
         deltaTiempo,
@@ -49,6 +79,10 @@ void Partida::reiniciar()
     tiempoTranscurrido = 0.0f;
     estado = EstadoPartida::Jugando;
 
+    oleadaActual = 1;
+    enTransicionOleada = false;
+    tiempoTransicionOleada = 0.0f;
+
     tablero = Tablero();
 
     profesor = Jugador(
@@ -66,7 +100,19 @@ void Partida::reiniciar()
     sistemaCargas = SistemaCargas();
 
     enemigos.clear();
-    crearEnemigosIniciales();
+    crearOleadaActual();
+}
+
+bool Partida::jugadorHabilitado(
+    IdJugador idJugador
+) const
+{
+    if (idJugador == IdJugador::Profesor)
+    {
+        return true;
+    }
+
+    return esModoDuo();
 }
 
 bool Partida::moverJugador(
@@ -74,7 +120,9 @@ bool Partida::moverJugador(
     Direccion direccion
 )
 {
-    if (estado != EstadoPartida::Jugando)
+    if (estado != EstadoPartida::Jugando ||
+        enTransicionOleada ||
+        !jugadorHabilitado(idJugador))
     {
         return false;
     }
@@ -148,7 +196,9 @@ bool Partida::colocarCarga(
     IdJugador idJugador
 )
 {
-    if (estado != EstadoPartida::Jugando)
+    if (estado != EstadoPartida::Jugando ||
+        enTransicionOleada ||
+        !jugadorHabilitado(idJugador))
     {
         return false;
     }
@@ -173,6 +223,46 @@ bool Partida::colocarCarga(
 EstadoPartida Partida::obtenerEstado() const
 {
     return estado;
+}
+
+ModoJuego Partida::obtenerModo() const
+{
+    return modo;
+}
+
+bool Partida::esModoDuo() const
+{
+    return modo == ModoJuego::Duo;
+}
+
+int Partida::obtenerOleadaActual() const
+{
+    return oleadaActual;
+}
+
+int Partida::obtenerBugsRestantes() const
+{
+    int cantidad = 0;
+
+    for (const std::unique_ptr<Enemigo>& enemigo : enemigos)
+    {
+        if (enemigo->estaActivo())
+        {
+            ++cantidad;
+        }
+    }
+
+    return cantidad;
+}
+
+bool Partida::estaEnTransicionOleada() const
+{
+    return enTransicionOleada;
+}
+
+float Partida::obtenerTiempoTransicionOleada() const
+{
+    return tiempoTransicionOleada;
 }
 
 const Tablero& Partida::obtenerTablero() const
@@ -208,42 +298,200 @@ Partida::obtenerEnemigos() const
     return enemigos;
 }
 
-void Partida::crearEnemigosIniciales()
+void Partida::crearOleadaActual()
 {
-    enemigos.push_back(
-        std::make_unique<BugBasico>(6, 7)
-    );
+    enemigos.clear();
 
-    enemigos.push_back(
-        std::make_unique<BugResistente>(8, 10)
-    );
+    switch (oleadaActual)
+    {
+        case 1:
+            crearEnemigosDeOleada(2, 0);
+            break;
+
+        case 2:
+            crearEnemigosDeOleada(2, 1);
+            break;
+
+        case 3:
+            crearEnemigosDeOleada(3, 2);
+            break;
+
+        case 4:
+            crearEnemigosDeOleada(4, 3);
+            break;
+
+        default:
+            estado = EstadoPartida::Victoria;
+            break;
+    }
+}
+
+void Partida::crearEnemigosDeOleada(
+    int cantidadBasicos,
+    int cantidadResistentes
+)
+{
+    for (int i = 0; i < cantidadBasicos; ++i)
+    {
+        agregarBugBasicoEnPosicionLibre();
+    }
+
+    for (int i = 0; i < cantidadResistentes; ++i)
+    {
+        agregarBugResistenteEnPosicionLibre();
+    }
+}
+
+bool Partida::agregarBugBasicoEnPosicionLibre()
+{
+    for (int fila = 1; fila < Tablero::FILAS - 1; ++fila)
+    {
+        for (int columna = 1;
+             columna < Tablero::COLUMNAS - 1;
+             ++columna)
+        {
+            if (posicionDisponibleParaEnemigo(fila, columna))
+            {
+                enemigos.push_back(
+                    std::make_unique<BugBasico>(fila, columna)
+                );
+
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool Partida::agregarBugResistenteEnPosicionLibre()
+{
+    for (int fila = Tablero::FILAS - 2; fila >= 1; --fila)
+    {
+        for (int columna = Tablero::COLUMNAS - 2;
+             columna >= 1;
+             --columna)
+        {
+            if (posicionDisponibleParaEnemigo(fila, columna))
+            {
+                enemigos.push_back(
+                    std::make_unique<BugResistente>(fila, columna)
+                );
+
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool Partida::posicionDisponibleParaEnemigo(
+    int fila,
+    int columna
+) const
+{
+    if (!tablero.esTransitable(fila, columna))
+    {
+        return false;
+    }
+
+    const int diferenciaFilaProfesor =
+        fila > profesor.obtenerFila()
+        ? fila - profesor.obtenerFila()
+        : profesor.obtenerFila() - fila;
+
+    const int diferenciaColumnaProfesor =
+        columna > profesor.obtenerColumna()
+        ? columna - profesor.obtenerColumna()
+        : profesor.obtenerColumna() - columna;
+
+    if (diferenciaFilaProfesor + diferenciaColumnaProfesor < 4)
+    {
+        return false;
+    }
+
+    if (esModoDuo())
+    {
+        const int diferenciaFilaEstudiante =
+            fila > estudiante.obtenerFila()
+            ? fila - estudiante.obtenerFila()
+            : estudiante.obtenerFila() - fila;
+
+        const int diferenciaColumnaEstudiante =
+            columna > estudiante.obtenerColumna()
+            ? columna - estudiante.obtenerColumna()
+            : estudiante.obtenerColumna() - columna;
+
+        if (diferenciaFilaEstudiante +
+            diferenciaColumnaEstudiante < 4)
+        {
+            return false;
+        }
+    }
+
+    for (const std::unique_ptr<Enemigo>& enemigo : enemigos)
+    {
+        if (enemigo->obtenerFila() == fila &&
+            enemigo->obtenerColumna() == columna)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool Partida::hayEnemigosActivos() const
+{
+    for (const std::unique_ptr<Enemigo>& enemigo : enemigos)
+    {
+        if (enemigo->estaActivo())
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void Partida::comprobarEstadoFinal()
 {
-    if (!profesor.estaActivo() &&
-        !estudiante.estaActivo())
+    const bool jugadoresDerrotados =
+        esModoDuo()
+        ? (!profesor.estaActivo() &&
+           !estudiante.estaActivo())
+        : !profesor.estaActivo();
+
+    if (jugadoresDerrotados)
     {
         estado = EstadoPartida::Derrota;
         return;
     }
 
-    bool existeEnemigoActivo = false;
-
-    for (const std::unique_ptr<Enemigo>& enemigo :
-         enemigos)
+    if (hayEnemigosActivos())
     {
-        if (enemigo->estaActivo())
-        {
-            existeEnemigoActivo = true;
-            break;
-        }
+        return;
     }
 
-    if (!existeEnemigoActivo)
+    if (oleadaActual >= TOTAL_OLEADAS)
     {
         estado = EstadoPartida::Victoria;
+        return;
     }
+
+    iniciarSiguienteOleada();
+}
+
+void Partida::iniciarSiguienteOleada()
+{
+    ++oleadaActual;
+
+    enemigos.clear();
+    sistemaCargas = SistemaCargas();
+
+    enTransicionOleada = true;
+    tiempoTransicionOleada = DURACION_TRANSICION_OLEADA;
 }
 
 Jugador& Partida::obtenerJugador(
@@ -264,6 +512,11 @@ bool Partida::posicionOcupadaPorOtroJugador(
     int columna
 ) const
 {
+    if (!esModoDuo())
+    {
+        return false;
+    }
+
     const Jugador& otroJugador =
         idJugador == IdJugador::Profesor
         ? estudiante
@@ -281,10 +534,13 @@ bool Partida::posicionOcupadaPorOtroJugador(
 void Partida::resolverDanioExplosiones()
 {
     aplicarDanioSiCorresponde(profesor);
-    aplicarDanioSiCorresponde(estudiante);
 
-    for (const std::unique_ptr<Enemigo>& enemigo :
-         enemigos)
+    if (esModoDuo())
+    {
+        aplicarDanioSiCorresponde(estudiante);
+    }
+
+    for (const std::unique_ptr<Enemigo>& enemigo : enemigos)
     {
         if (!enemigo->estaActivo())
         {
@@ -334,8 +590,7 @@ void Partida::actualizarEnemigos(
     float deltaTiempo
 )
 {
-    for (const std::unique_ptr<Enemigo>& enemigo :
-         enemigos)
+    for (const std::unique_ptr<Enemigo>& enemigo : enemigos)
     {
         if (!enemigo->estaActivo())
         {
@@ -345,9 +600,12 @@ void Partida::actualizarEnemigos(
         enemigo->actualizarEstado(deltaTiempo);
 
         BugBasico* bugBasico =
-            dynamic_cast<BugBasico*>(
-                enemigo.get()
-            );
+            dynamic_cast<BugBasico*>(enemigo.get());
+
+        const Jugador& segundoObjetivo =
+            esModoDuo()
+            ? estudiante
+            : profesor;
 
         if (bugBasico != nullptr)
         {
@@ -356,7 +614,7 @@ void Partida::actualizarEnemigos(
                 tablero,
                 sistemaCargas,
                 profesor,
-                estudiante
+                segundoObjetivo
             );
         }
         else
@@ -365,7 +623,7 @@ void Partida::actualizarEnemigos(
                 deltaTiempo,
                 tablero,
                 profesor,
-                estudiante
+                segundoObjetivo
             );
         }
     }
@@ -374,7 +632,11 @@ void Partida::actualizarEnemigos(
 void Partida::resolverDanioPorContacto()
 {
     aplicarDanioPorContacto(profesor);
-    aplicarDanioPorContacto(estudiante);
+
+    if (esModoDuo())
+    {
+        aplicarDanioPorContacto(estudiante);
+    }
 }
 
 void Partida::aplicarDanioPorContacto(
@@ -387,8 +649,7 @@ void Partida::aplicarDanioPorContacto(
         return;
     }
 
-    for (const std::unique_ptr<Enemigo>& enemigo :
-         enemigos)
+    for (const std::unique_ptr<Enemigo>& enemigo : enemigos)
     {
         if (!enemigo->estaActivo())
         {

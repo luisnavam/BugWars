@@ -51,6 +51,7 @@
 		<Unit filename="include/modelo/Explosion.h" />
 		<Unit filename="include/modelo/IdJugador.h" />
 		<Unit filename="include/modelo/Jugador.h" />
+		<Unit filename="include/modelo/ModoJuego.h" />
 		<Unit filename="include/modelo/Partida.h" />
 		<Unit filename="include/modelo/Posicion.h" />
 		<Unit filename="include/modelo/SistemaCargas.h" />

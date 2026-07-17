@@ -1,5 +1,4 @@
 #include "controlador/JuegoControlador.h"
-
 #include <cstdlib>
 #include <exception>
 #include <iostream>
