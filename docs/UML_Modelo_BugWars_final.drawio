@@ -1,0 +1,164 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="UML Modelo Bug Wars" id="XDrYia5oPFLC6udRuToo">
+    <mxGraphModel dx="4150" dy="1530" grid="0" gridSize="10" guides="0" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-43" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;" value="" vertex="1">
+          <mxGeometry height="1440" width="2502" x="239" y="312" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-1" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=22;fontStyle=1;" value="&lt;font style=&quot;font-size: 36px;&quot;&gt;Diagrama de Clases UML - Modelo de Bug Wars&lt;/font&gt;" vertex="1">
+          <mxGeometry height="40" width="650" x="1144" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;" value="&lt;b&gt;Partida&lt;/b&gt;&lt;hr/&gt;- tiempoTranscurrido: float&lt;br/&gt;- estado: EstadoPartida&lt;br/&gt;- modo: ModoJuego&lt;br/&gt;- oleadaActual: int&lt;br/&gt;- enTransicionOleada: bool&lt;br/&gt;- tiempoTransicionOleada: float&lt;br/&gt;- tablero: Tablero&lt;br/&gt;- profesor: Jugador&lt;br/&gt;- estudiante: Jugador&lt;br/&gt;- sistemaCargas: SistemaCargas&lt;br/&gt;- enemigos: vector&lt;unique_ptr&lt;Enemigo&gt;&gt;&lt;hr/&gt;+ iniciar(modo: ModoJuego): void&lt;br/&gt;+ actualizar(deltaTiempo: float): void&lt;br/&gt;+ reiniciar(): void&lt;br/&gt;+ moverJugador(id: IdJugador, direccion: Direccion): bool&lt;br/&gt;+ colocarCarga(id: IdJugador): bool&lt;br/&gt;+ obtenerEstado(): EstadoPartida&lt;br/&gt;+ obtenerModo(): ModoJuego&lt;br/&gt;+ obtenerOleadaActual(): int&lt;br/&gt;+ obtenerBugsRestantes(): int" vertex="1">
+          <mxGeometry height="370" width="323" x="1024" y="651" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;Jugador&lt;/b&gt;&lt;hr/&gt;- nombre: string&lt;br/&gt;- fila: int&lt;br/&gt;- columna: int&lt;br/&gt;- vidas: int&lt;br/&gt;- activo: bool&lt;br/&gt;- invulnerabilidadRestante: float&lt;hr/&gt;+ cambiarPosicion(fila: int, columna: int): void&lt;br/&gt;+ recibirDanio(): void&lt;br/&gt;+ actualizar(deltaTiempo: float): void&lt;br/&gt;+ obtenerVidas(): int&lt;br/&gt;+ estaActivo(): bool&lt;br/&gt;+ esInvulnerable(): bool" vertex="1">
+          <mxGeometry height="251" width="263" x="360" y="551" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;Tablero&lt;/b&gt;&lt;hr/&gt;+ FILAS: int = 13&lt;br/&gt;+ COLUMNAS: int = 15&lt;br/&gt;- celdas: array&lt;array&lt;TipoCelda&gt;&gt;&lt;hr/&gt;+ obtenerCelda(fila: int, columna: int): TipoCelda&lt;br/&gt;+ estaDentro(fila: int, columna: int): bool&lt;br/&gt;+ esTransitable(fila: int, columna: int): bool&lt;br/&gt;+ bloqueaExplosion(fila: int, columna: int): bool&lt;br/&gt;+ esDestruible(fila: int, columna: int): bool&lt;br/&gt;+ destruirCelda(fila: int, columna: int): bool&lt;br/&gt;- inicializar(): void" vertex="1">
+          <mxGeometry height="213" width="280" x="1512" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#f8cecc;strokeColor=#b85450;" value="&lt;b&gt;SistemaCargas&lt;/b&gt;&lt;hr/&gt;- cargas: vector&lt;CargaCodigo&gt;&lt;br/&gt;- explosiones: vector&lt;Explosion&gt;&lt;hr/&gt;+ colocarCarga(fila: int, columna: int, propietario: IdJugador): bool&lt;br/&gt;+ actualizar(deltaTiempo: float, tablero: Tablero): void&lt;br/&gt;+ existeCargaEn(fila: int, columna: int): bool&lt;br/&gt;+ jugadorTieneCargaActiva(propietario: IdJugador): bool&lt;br/&gt;+ obtenerCargas(): vector&lt;CargaCodigo&gt;&lt;br/&gt;+ obtenerExplosiones(): vector&lt;Explosion&gt;&lt;br/&gt;- calcularPropagacion(carga: CargaCodigo, tablero: Tablero): vector&lt;Posicion&gt;&lt;br/&gt;- eliminarElementosFinalizados(): void" vertex="1">
+          <mxGeometry height="222" width="430" x="971" y="1255" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;CargaCodigo&lt;/b&gt;&lt;hr/&gt;- fila: int&lt;br/&gt;- columna: int&lt;br/&gt;- propietario: IdJugador&lt;br/&gt;- tiempoRestante: float&lt;br/&gt;- alcance: int&lt;br/&gt;- estado: EstadoCarga&lt;hr/&gt;+ actualizar(deltaTiempo: float): void&lt;br/&gt;+ finalizar(): void&lt;br/&gt;+ debeEjecutarse(): bool&lt;br/&gt;+ estaFinalizada(): bool&lt;br/&gt;+ obtenerEstado(): EstadoCarga&lt;br/&gt;+ obtenerPropietario(): IdJugador" vertex="1">
+          <mxGeometry height="236" width="215" x="335" y="1248" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;Explosion&lt;/b&gt;&lt;hr/&gt;- posicionesAfectadas: vector&lt;Posicion&gt;&lt;br/&gt;- tiempoRestante: float&lt;hr/&gt;+ actualizar(deltaTiempo: float): void&lt;br/&gt;+ estaActiva(): bool&lt;br/&gt;+ afecta(fila: int, columna: int): bool&lt;br/&gt;+ obtenerPosicionesAfectadas(): vector&lt;Posicion&gt;" vertex="1">
+          <mxGeometry height="150" width="230" x="1071" y="1544" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;Posicion&lt;/b&gt;&lt;hr/&gt;- fila: int&lt;br/&gt;- columna: int&lt;hr/&gt;+ Posicion(fila: int, columna: int)&lt;br/&gt;+ obtenerFila(): int&lt;br/&gt;+ obtenerColumna(): int" vertex="1">
+          <mxGeometry height="150" width="230" x="1403" y="1544" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=2;" value="&lt;b&gt;&lt;&lt;abstract&gt;&gt;&lt;br/&gt;Enemigo&lt;/b&gt;&lt;hr/&gt;# fila: int&lt;br/&gt;# columna: int&lt;br/&gt;# puntosVida: int&lt;br/&gt;# activo: bool&lt;br/&gt;- invulnerabilidadRestante: float&lt;hr/&gt;+ actualizar(...): void = 0&lt;br/&gt;+ actualizarEstado(deltaTiempo: float): void&lt;br/&gt;+ recibirImpacto(): void&lt;br/&gt;+ estaActivo(): bool&lt;br/&gt;+ esInvulnerable(): bool&lt;br/&gt;# cambiarPosicion(fila: int, columna: int): void" vertex="1">
+          <mxGeometry height="240" width="300" x="1701" y="852" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;BugBasico&lt;/b&gt;&lt;hr/&gt;- tiempoHastaMovimiento: float&lt;br/&gt;- generador: mt19937&lt;hr/&gt;+ actualizar(...): void&lt;br/&gt;+ actualizarConCargas(...): void&lt;br/&gt;- decidirMovimiento(...): void&lt;br/&gt;- intentarPerseguir(...): void&lt;br/&gt;- intentarMoverAleatoriamente(...): void&lt;br/&gt;- posicionValida(...): bool&lt;br/&gt;- buscarJugadorMasCercano(...): Jugador*&lt;br/&gt;- calcularDistancia(jugador: Jugador): int" vertex="1">
+          <mxGeometry height="240" width="300" x="2062" y="852" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;BugResistente&lt;/b&gt;&lt;hr/&gt;+ BugResistente(filaInicial: int, columnaInicial: int)&lt;br/&gt;+ estaDanado(): bool" vertex="1">
+          <mxGeometry height="130" width="270" x="2422" y="907" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-12" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;" value="&lt;b&gt;&lt;&lt;enumeration&gt;&gt;&lt;br/&gt;EstadoPartida&lt;/b&gt;&lt;hr/&gt;Jugando&lt;br/&gt;Victoria&lt;br/&gt;Derrota" vertex="1">
+          <mxGeometry height="120" width="100" x="756" y="541" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-13" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;" value="&lt;b&gt;&lt;&lt;enumeration&gt;&gt;&lt;br/&gt;ModoJuego&lt;/b&gt;&lt;hr/&gt;Solo&lt;br/&gt;Duo" vertex="1">
+          <mxGeometry height="120" width="100" x="755" y="691" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;" value="&lt;b&gt;&lt;&lt;enumeration&gt;&gt;&lt;br/&gt;IdJugador&lt;/b&gt;&lt;hr/&gt;Profesor&lt;br/&gt;Estudiante" vertex="1">
+          <mxGeometry height="120" width="100" x="756" y="1021" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-15" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;" value="&lt;b&gt;&lt;&lt;enumeration&gt;&gt;&lt;br/&gt;Direccion&lt;/b&gt;&lt;hr/&gt;Arriba&lt;br/&gt;Abajo&lt;br/&gt;Izquierda&lt;br/&gt;Derecha" vertex="1">
+          <mxGeometry height="120" width="100" x="756" y="860" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-16" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;" value="&lt;b&gt;&lt;&lt;enumeration&gt;&gt;&lt;br/&gt;EstadoCarga&lt;/b&gt;&lt;hr/&gt;Compilando&lt;br/&gt;ListaParaEjecutar&lt;br/&gt;Finalizada" vertex="1">
+          <mxGeometry height="115" width="122" x="381" y="1559" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-17" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;" value="&lt;b&gt;&lt;&lt;enumeration&gt;&gt;&lt;br/&gt;TipoCelda&lt;/b&gt;&lt;hr/&gt;Piso&lt;br/&gt;Pared&lt;br/&gt;Pupitre&lt;br/&gt;Computadora&lt;br/&gt;Pizarron&lt;br/&gt;EscritorioProfesor&lt;br/&gt;Biblioteca&lt;br/&gt;Puerta&lt;br/&gt;Ventana&lt;br/&gt;SpawnProfesor&lt;br/&gt;SpawnEstudiante" vertex="1">
+          <mxGeometry height="226" width="131" x="1869" y="573" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-18" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;" target="ONTO55Juc4_Gti0wmFxE-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-19" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;" target="ONTO55Juc4_Gti0wmFxE-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-20" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=diamond;startFill=1;endArrow=none;" target="ONTO55Juc4_Gti0wmFxE-4" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;1&lt;/font&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-21" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=diamond;startFill=1;endArrow=none;" target="ONTO55Juc4_Gti0wmFxE-3" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;2&lt;/font&gt;">
+          <mxGeometry relative="1" x="-0.3054" y="-1" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="672.29" y="836" />
+              <mxPoint x="672.29" y="681.65" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-22" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=diamond;startFill=1;endArrow=none;" target="ONTO55Juc4_Gti0wmFxE-5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-23" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=diamond;startFill=1;endArrow=none;" target="ONTO55Juc4_Gti0wmFxE-9" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;0..*&lt;/font&gt;">
+          <mxGeometry relative="1" x="-0.4222" as="geometry">
+            <mxPoint y="-1" as="offset" />
+            <Array as="points">
+              <mxPoint x="1429.57" y="836.03" />
+              <mxPoint x="1429.57" y="973" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-24" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=diamond;startFill=1;endArrow=none;" target="ONTO55Juc4_Gti0wmFxE-6" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;0..*&lt;/font&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-25" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=diamond;startFill=1;endArrow=none;" target="ONTO55Juc4_Gti0wmFxE-7" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;0..*&lt;/font&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-26" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=diamond;startFill=1;endArrow=none;" target="ONTO55Juc4_Gti0wmFxE-8" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;1..*&lt;/font&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-27" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;" target="ONTO55Juc4_Gti0wmFxE-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-28" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;" target="ONTO55Juc4_Gti0wmFxE-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-29" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;" target="ONTO55Juc4_Gti0wmFxE-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-30" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ONTO55Juc4_Gti0wmFxE-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-31" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;" target="ONTO55Juc4_Gti0wmFxE-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-32" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="ONTO55Juc4_Gti0wmFxE-14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="442.48" y="1214.14" />
+              <mxPoint x="806.1" y="1214.14" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-33" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="ONTO55Juc4_Gti0wmFxE-4" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;usa&lt;/font&gt;">
+          <mxGeometry relative="1" x="-0.1567" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1186.04" y="1098.13" />
+              <mxPoint x="1661.96" y="1098.13" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-41" connectable="0" parent="ONTO55Juc4_Gti0wmFxE-33" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.7755" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-34" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;" target="ONTO55Juc4_Gti0wmFxE-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-35" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;" target="ONTO55Juc4_Gti0wmFxE-3" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;consulta&lt;/font&gt;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2033.2" y="972" />
+              <mxPoint x="2033.2" y="1180" />
+              <mxPoint x="299.4" y="1180" />
+              <mxPoint x="299.4" y="676.6" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-36" edge="1" parent="1" source="ONTO55Juc4_Gti0wmFxE-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=open;endFill=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ONTO55Juc4_Gti0wmFxE-5" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;consulta&lt;/font&gt;">
+          <mxGeometry relative="1" x="0.1534" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="2212" y="1342.01" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ONTO55Juc4_Gti0wmFxE-37" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=15;align=left;verticalAlign=top;spacing=8;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" value="&lt;b&gt;Referencias&lt;/b&gt;&lt;br/&gt;◆ Composición&lt;br/&gt;△ Herencia&lt;br/&gt;---&gt; Dependencia" vertex="1">
+          <mxGeometry height="82" width="114" x="1122" y="521" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
